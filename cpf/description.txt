@@ -1,0 +1,6 @@
+
+
+get root and execute /root/get_flag
+
+ssh cpf@[VM IP ADDRESS]
+(password: 1)

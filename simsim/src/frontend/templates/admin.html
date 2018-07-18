@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC>
+<html>
+
+<head>
+    <title>Admin page</title>
+    <link href="/static/semantic.min.css" rel="stylesheet" />
+    <script src="/static/jquery.min.js"></script>
+    <style>
+        #frame {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>I'm admin</h1>
+    <div class="ui list" id="chats"></div>
+    <iframe id="frame" src="http://localhost:{{ port }}/"></iframe>
+    <script>
+        let count = 0,
+            frame = $('#frame')[0],
+            $chats = $('#chats');
+        setInterval(function () {
+            $.getJSON('/pending?id={{ id }}', function (messages) {
+                for (let item of messages) {
+                    $(`<div id="${count++}" class="item message">`)
+                        .html(item)
+                        .appendTo($chats);
+                    send_to_backend(item);
+                }
+            })
+        }, 1000);
+
+        function send_to_backend(message) {
+            frame.contentWindow.postMessage(message, '*');
+        }
+
+        window.onmessage = function(event) {
+            $.post('/chat_client', {id: '{{ id }}', text: event.data})
+        }
+    </script>
+</body>
+
+</html>

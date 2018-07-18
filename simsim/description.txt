@@ -1,0 +1,2 @@
+Exploit the server and execute C:\get_flag.exe <team id> to get flag.
+(flag is printed to stdout by the exe)

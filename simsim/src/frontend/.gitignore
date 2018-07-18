@@ -1,0 +1,4 @@
+*.pyc
+db/*.db*
+sqlite3.dll
+binary.exe

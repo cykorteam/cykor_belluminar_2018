@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC>
+<html>
+
+<head>
+    <link rel="stylesheet" href="/static/semantic.min.css">
+    <script src="/static/jquery.min.js"></script>
+    <title>
+        index page
+    </title>
+    <style>
+        h1 {
+            padding-top: 3rem;
+        }
+
+        .log {
+            height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ui basic loading segment container" id="main">
+        <h1>Simsim</h1>
+        <p>In our country, all Windows PCs are easily exploitable through 3rd party application. Here's one example.</p>
+        <p>This time, we give you an opportunity to attack the admin's PC.
+            <a href="/static/binary.zip">Here's the web server.</a> You can get flag by running C:\get_flag.exe "team id".</p>
+        <script>
+            var TIMEOUT = Number('{{ timeout }}');
+
+            function get_pow() {
+                const $button = $(button);
+                $button.addClass('loading');
+
+                $.get('/pow?' + Math.random(), function (pow) {
+                    var worker = new Worker('/static/pow_worker.js?' + Math.random());
+
+                    worker.postMessage(pow);
+
+                    worker.onmessage = function (event) {
+                        var data = event.data;
+                        $.post('/', { data: data })
+                            .done(function (data) {
+                                if (data === 'success') {
+                                    // start chat
+                                    start_chat();
+                                }
+                            })
+                            .always(function () {
+                                $button.removeClass('loading');
+                            })
+                    }
+                })
+            }
+
+            function send_text() {
+                $.post('/chat', {
+                    text: $('#text').val()
+                }, function (data) { });
+                $('#text').val('');
+            }
+            function start_chat() {
+                button.onclick = null;
+                $('.nochat').addClass('disabled');
+                $('.chat').removeClass('disabled');
+                const timer = setInterval(function () {
+                    $.getJSON('/pending_client', function (data) {
+                        if (data !== 'closed')
+                            for (item of data) {
+                                $('<div class="item message">')
+                                    .html(item)
+                                    .appendTo(chatlogs)
+                                    chatlogs.scrollTo(0, 0x7ffffff)
+                            }
+                        else end_chat();
+                    });
+                }, 1000);
+                const end_chat = (function (timer) {
+                    return function () {
+                        button.onclick = function () { get_pow(button); }
+                        $('.nochat').removeClass('disabled');
+                        $('.chat').addClass('disabled');
+                        clearInterval(timer);
+                    }
+                })(timer);
+            }
+        </script>
+        <button id="button" class="nochat ui button" onclick="get_pow()">
+            Chat with the admin for 3 minutes! (generates PoW)
+        </button>
+        <div id="chat" class="ui chat segment">
+            <form class="ui form" action="/submit" method="POST" onsubmit="send_text(); return false;">
+                <div class="ui header">Chat with admin</div>
+                <div class="log ui relaxed list" id="chatlogs">
+                </div>
+                <div class="ui action chat input">
+                    <input id="text" type="text" placeholder="Message ..." autocomplete="off" />
+                    <button type="submit" class="ui chat primary button">Go</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        $.get('/status', function (data) {
+            $('#main').removeClass('loading');
+            if (data === 'closed') $('.chat').addClass('disabled');
+            else start_chat();
+        });
+    </script>
+</body>
+
+</html>

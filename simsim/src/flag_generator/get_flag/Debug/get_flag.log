@@ -1,0 +1,3 @@
+﻿  stdafx.cpp
+  aes.c
+c:\users\berry\b\windows\flag_generator\get_flag\aes.c(1): fatal error C1853: 'Debug\get_flag.pch' 미리 컴파일된 헤더 파일이 이전 버전의 컴파일러에서 만들어졌거나, 미리 컴파일된 헤더가 C++인데 C에서 사용하고 있거나 또는 그 반대의 경우입니다.
